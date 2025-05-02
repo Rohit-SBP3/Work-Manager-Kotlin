@@ -96,7 +96,5 @@ class MainActivity : ComponentActivity() {
  * 🔍 Types of Work:
  * OneTimeWorkRequest – run once
  * PeriodicWorkRequest – repeat work periodically
- *
- *
  */
 
