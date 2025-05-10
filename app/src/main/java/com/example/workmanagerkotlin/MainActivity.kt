@@ -1,5 +1,7 @@
 package com.example.workmanagerkotlin
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -7,14 +9,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
+import androidx.core.app.ActivityCompat
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints.Builder
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.example.workmanagerkotlin.service.OfferService
 import com.example.workmanagerkotlin.ui.theme.WorkManagerKotlinTheme
 import com.example.workmanagerkotlin.worker.DemoWorker
 import java.util.concurrent.TimeUnit
@@ -22,17 +27,28 @@ import java.util.concurrent.TimeUnit
 class MainActivity : ComponentActivity() {
 
     private val workManager = WorkManager.getInstance(this)
+    val intent = Intent(this, OfferService::class.java)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
+
             WorkManagerKotlinTheme {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ){
                     Text("Hello Work Manager!!")
+                    Button(
+                        onClick = {
+                            startForegroundService(intent)
+                        }
+                    ) {
+                        Text("Show Offer")
+                    }
                 }
             }
         }
@@ -43,11 +59,7 @@ class MainActivity : ComponentActivity() {
     private fun doWork(){
         val request = OneTimeWorkRequest.Builder(DemoWorker::class.java)
             .setConstraints(Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                10,
-                TimeUnit.SECONDS
-            )
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
             .build()
 
         val request2 = OneTimeWorkRequest.Builder(DemoWorker::class.java)
@@ -64,11 +76,7 @@ class MainActivity : ComponentActivity() {
     private fun doPeriodicWork(){
         val request = PeriodicWorkRequest.Builder(DemoWorker::class.java,15,TimeUnit.MINUTES)
             .setConstraints(Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                10,
-                TimeUnit.SECONDS
-            )
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
             .build()
 
         workManager.enqueue(request)
@@ -81,6 +89,7 @@ class MainActivity : ComponentActivity() {
         Log.d("Main Worker", name)
     }
 }
+
 
 /*** Work Manager:-
  * WorkManager is an Android Jetpack library used to schedule and run deferrable, guaranteed background work—even if the app exits or the device restarts.
