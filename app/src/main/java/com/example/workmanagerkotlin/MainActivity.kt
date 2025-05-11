@@ -1,7 +1,6 @@
 package com.example.workmanagerkotlin
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,17 +8,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
-import androidx.core.app.ActivityCompat
+import androidx.compose.ui.Modifier
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints.Builder
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.example.workmanagerkotlin.service.OfferService
+import com.example.workmanagerkotlin.service.BackgroundService
+import com.example.workmanagerkotlin.service.ForegroundOfferService
 import com.example.workmanagerkotlin.ui.theme.WorkManagerKotlinTheme
 import com.example.workmanagerkotlin.worker.DemoWorker
 import java.util.concurrent.TimeUnit
@@ -27,8 +28,6 @@ import java.util.concurrent.TimeUnit
 class MainActivity : ComponentActivity() {
 
     private val workManager = WorkManager.getInstance(this)
-    val intent = Intent(this, OfferService::class.java)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,10 +35,20 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
+            // Add for post_permission above api-33..
+            /*if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION),1000)
+            }*/
+
+
+            val intent = Intent(this, ForegroundOfferService::class.java)
+            val bIntent = Intent(this, BackgroundService::class.java)
+
             WorkManagerKotlinTheme {
                 Column(
+                    Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.SpaceEvenly
                 ){
                     Text("Hello Work Manager!!")
                     Button(
@@ -48,6 +57,20 @@ class MainActivity : ComponentActivity() {
                         }
                     ) {
                         Text("Show Offer")
+                    }
+                    Button(
+                        onClick = {
+                            startService(bIntent)
+                        }
+                    ) {
+                        Text("Start BService")
+                    }
+                    Button(
+                        onClick = {
+                            stopService(bIntent)
+                        }
+                    ) {
+                        Text("Stop BService")
                     }
                 }
             }

@@ -29,10 +29,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.OfferService"
+        <service android:name=".service.ForegroundOfferService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync"/>
+
+        <service android:name=".service.BackgroundService"
+            android:exported="false"
+            android:enabled="true"/>
+
     </application>
 
 </manifest>

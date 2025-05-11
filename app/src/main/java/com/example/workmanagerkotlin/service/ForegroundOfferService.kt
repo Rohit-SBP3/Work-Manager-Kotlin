@@ -1,22 +1,19 @@
 package com.example.workmanagerkotlin.service
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.workmanagerkotlin.MainActivity
 import com.example.workmanagerkotlin.R
 
-class OfferService: Service() {
+class ForegroundOfferService: Service() {
 
     private lateinit var handlerThread: HandlerThread
     private lateinit var handler: Handler
@@ -56,12 +53,12 @@ class OfferService: Service() {
 
     fun getPendingIntent(): PendingIntent {
         val intent = Intent(this, MainActivity::class.java)
-        return PendingIntent.getActivity(this,0,intent, PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_IMMUTABLE)
     }
 
     fun createNotificationChannel(): NotificationChannel {
         val channel = NotificationChannel("ChannelId","WM", NotificationManager.IMPORTANCE_DEFAULT)
-        val notificationManager = ContextCompat.getSystemService(this, NotificationManager::class.java)
+        val notificationManager = ContextCompat.getSystemService(this,NotificationManager::class.java)
         notificationManager!!.createNotificationChannel(channel)
         return channel
     }
